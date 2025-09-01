@@ -55,7 +55,7 @@ for (my $i = 0; $i <= $#stars; $i++) {
 
       my $sep = angsep_microdeg($ra1, $de1, $ra2, $de2);
 
-      if ($sep <= 15000000) {
+      if ($sep > 9 && $sep <= 15000000) {
          print "$sep $stars[$i] $stars[$j]\n";
       }
    }
