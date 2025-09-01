@@ -7,6 +7,8 @@ use Math::Trig qw(deg2rad rad2deg acos);
 my @stars;
 my %stars;
 
+my $scale = 0.5 + rand(1.0); # range 0.5 to 1.5
+
 sub angsep_microdeg {
     my ($ra1_u, $dec1_u, $ra2_u, $dec2_u) = @_;
 
@@ -85,6 +87,7 @@ for (my $i = 0; $i < 5; $i++) {
       my ($ra2, $de2, $bright2) = split / /, $stars{$picks[$j]};
 
       my $sep = angsep_microdeg($ra1, $de1, $ra2, $de2);
+      $sep = int ($sep * $scale);
       print "$sep\n";
    }
 }
