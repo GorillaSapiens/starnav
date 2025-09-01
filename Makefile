@@ -3,3 +3,6 @@ angles.txt: catalog.txt angles.pl
 
 catalog.txt: yale.txt parse.pl
 	./parse.pl < yale.txt > catalog.txt
+
+clean:
+	rm -f angles.txt catalog.txt
