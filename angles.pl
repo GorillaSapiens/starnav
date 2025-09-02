@@ -34,7 +34,7 @@ while (<>) {
    s/[\x0a\x0d]//g;
    s/[\s]+/ /g;
 
-   my ($ra, $dec, $bright, $name) = split / /;
+   my ($ra, $dec, $bright, $name) = split /,/;
 
    if (defined($stars{$name})) {
       print "duplicate name $name\n";
@@ -42,21 +42,21 @@ while (<>) {
    }
 
    if (length($name)) {
-      $stars{$name} = "$ra $dec $bright";
+      $stars{$name} = "$ra,$dec,$bright";
    }
 }
 
 @stars = keys(%stars);
 
 for (my $i = 0; $i <= $#stars; $i++) {
-   my ($ra1, $de1, $bright1) = split / /, $stars{$stars[$i]};
+   my ($ra1, $de1, $bright1) = split /,/, $stars{$stars[$i]};
    for (my $j = $i + 1; $j <= $#stars; $j++) {
-      my ($ra2, $de2, $bright2) = split / /, $stars{$stars[$j]};
+      my ($ra2, $de2, $bright2) = split /,/, $stars{$stars[$j]};
 
       my $sep = angsep_microdeg($ra1, $de1, $ra2, $de2);
 
-      if ($sep > 9 && $sep <= 15000000) {
-         print "$sep $stars[$i] $stars[$j]\n";
+      if ($sep > 9 && $sep <= 90_000_000) {
+         print "$sep,$stars[$i],$stars[$j]\n";
       }
    }
 }

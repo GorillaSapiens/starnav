@@ -80,11 +80,12 @@ for (my $i = 0; $i <= $#clues; $i++) {
          }
 
          if ($match == -1) {
-            print "no match for $list[0] $list[1]\n";
-            printf("%02x/%02x\n", int($list[0] * 255), int($list[1] * 255));
-            exit(-1);
+            print "?? no match for $list[0] $list[1]\n";
+            printf("?? %02x/%02x\n", int($list[0] * 255), int($list[1] * 255));
          }
-         print $candidates[$match];
+         else {
+            print $candidates[$match];
+         }
       }
    }
 }
