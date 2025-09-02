@@ -29,18 +29,18 @@ foreach my $clue (@clues) {
 print "==\n";
 
 for (my $i = 0; $i <= $#clues; $i++) {
-   my $a = $clues[$i] + 0.0;
+   my $aa = $clues[$i] + 0.0;
    for (my $j = $i+1; $j <= $#clues; $j++) {
-      my $b = $clues[$j] + 0.0;
+      my $bb = $clues[$j] + 0.0;
       for (my $k = $j+1; $k <= $#clues; $k++) {
          my @candidates = ();
-         my $c = $clues[$k] + 0.0;
+         my $cc = $clues[$k] + 0.0;
 
-         my $biggest = $a;
-         if ($b > $biggest) { $biggest = $b; }
-         if ($c > $biggest) { $biggest = $c; }
+         my $biggest = $aa;
+         if ($bb > $biggest) { $biggest = $bb; }
+         if ($cc > $biggest) { $biggest = $cc; }
 
-         my @list = ($a/$biggest, $b/$biggest, $c/$biggest);
+         my @list = ($aa/$biggest, $bb/$biggest, $cc/$biggest);
          @list = sort { $a <=> $b } @list;
 
          my $u = int($list[0] * 255);
@@ -79,6 +79,11 @@ for (my $i = 0; $i <= $#clues; $i++) {
             }
          }
 
+         if ($match == -1) {
+            print "no match for $list[0] $list[1]\n";
+            printf("%02x/%02x\n", int($list[0] * 255), int($list[1] * 255));
+            exit(-1);
+         }
          print $candidates[$match];
       }
    }
