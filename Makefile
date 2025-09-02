@@ -1,4 +1,4 @@
-triangles.txt: angles.txt triangles.pl
+triangles: angles.txt triangles.pl
 	./triangles.pl < angles.txt > triangles.txt
 
 angles.txt: catalog.txt angles.pl
@@ -9,3 +9,4 @@ catalog.txt: yale.txt parse.pl
 
 clean:
 	rm -f angles.txt catalog.txt
+	rm -rf triangles

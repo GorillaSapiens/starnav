@@ -7,6 +7,8 @@ use Math::Trig qw(deg2rad rad2deg acos);
 my %stars;
 my %angles;
 
+`mkdir -p triangles`;
+
 while (<>) {
    s/[\x0a\x0d]//g;
    my ($angle, $a, $b) = split / /;
@@ -53,7 +55,13 @@ for (my $i = 0; $i <= $#stars; $i++) {
             my @list = ($aij, $ajk, $aki);
             @list = sort { $a <=> $b } @list;
 
-            print "$list[0] $list[1] $iname $jname $kname\n";
+            my $x = int($list[0] * 255);
+            $x = sprintf("%02x", $x);
+            my $y = int($list[1] * 255);
+            $y = sprintf("%02x", $y);
+
+            `mkdir -p triangles/$x`;
+            `echo $list[0] $list[1] $iname $jname $kname >> triangles/$x/$y`;
          }
       }
    }
