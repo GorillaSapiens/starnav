@@ -1,0 +1,4 @@
+mag_5_stars.csv comes from
+https://johnpratt.com/items/astronomy/mag_5_stars.html
+https://johnpratt.com/items/astronomy/mag_5_stars.csv
+
