@@ -18,17 +18,17 @@ for (my $i = 0; $i < 256; $i++) {
 }
 
 sub angsep_microdeg {
-    my ($ra1_u, $dec1_u, $ra2_u, $dec2_u) = @_;
+    my ($lon1_u, $lat1_u, $lon2_u, $lat2_u) = @_;
 
     # Convert microdegrees -> degrees -> radians
-    my $ra1  = deg2rad($ra1_u  / 1e6);
-    my $dec1 = deg2rad($dec1_u / 1e6);
-    my $ra2  = deg2rad($ra2_u  / 1e6);
-    my $dec2 = deg2rad($dec2_u / 1e6);
+    my $lon1  = deg2rad($lon1_u  / 1e6);
+    my $lat1 = deg2rad($lat1_u / 1e6);
+    my $lon2  = deg2rad($lon2_u  / 1e6);
+    my $lat2 = deg2rad($lat2_u / 1e6);
 
     # Spherical law of cosines
-    my $cos_theta = sin($dec1) * sin($dec2) +
-                    cos($dec1) * cos($dec2) * cos($ra1 - $ra2);
+    my $cos_theta = sin($lat1) * sin($lat2) +
+                    cos($lat1) * cos($lat2) * cos($lon1 - $lon2);
 
     # Clamp against roundoff
     $cos_theta = 1  if $cos_theta > 1;
@@ -41,11 +41,11 @@ sub angsep_microdeg {
 
 # Convert RA/Dec (microdegrees) to unit Cartesian vector on the celestial sphere
 sub radec_u_to_vec {
-    my ($ra_u, $dec_u) = @_;
-    my $ra  = deg2rad($ra_u  / 1e6);
-    my $dec = deg2rad($dec_u / 1e6);
-    my $c   = cos($dec);
-    return [ $c*cos($ra), $c*sin($ra), sin($dec) ];
+    my ($lon_u, $lat_u) = @_;
+    my $lon  = deg2rad($lon_u  / 1e6);
+    my $lat = deg2rad($lat_u / 1e6);
+    my $c   = cos($lat);
+    return [ $c*cos($lon), $c*sin($lon), sin($lat) ];
 }
 
 sub v_add { [ $_[0]->[0]+$_[1]->[0], $_[0]->[1]+$_[1]->[1], $_[0]->[2]+$_[1]->[2] ] }
@@ -62,11 +62,11 @@ sub v_norm  { my ($a)=@_; my $m=sqrt(v_dot($a,$a)); v_scale($a, 1.0/$m) }
 # Orientation of three stars A,B,C given as (RA_u,Dec_u)
 # Returns +1 for CCW, -1 for CW in local East(+x)/North(+y)
 sub orientation_enu {
-    my ($ra1,$de1, $ra2,$de2, $ra3,$de3) = @_;
+    my ($lon1,$lat1, $lon2,$lat2, $lon3,$lat3) = @_;
 
-    my $v1 = radec_u_to_vec($ra1,$de1);
-    my $v2 = radec_u_to_vec($ra2,$de2);
-    my $v3 = radec_u_to_vec($ra3,$de3);
+    my $v1 = radec_u_to_vec($lon1,$lat1);
+    my $v2 = radec_u_to_vec($lon2,$lat2);
+    my $v3 = radec_u_to_vec($lon3,$lat3);
 
     # Local "zenith" ~ average direction; normalize
     my $c  = v_norm( v_add( v_add($v1,$v2), $v3 ) );
@@ -108,7 +108,7 @@ while (<>) {
    s/[\x0a\x0d]//g;
    s/[\s]+/ /g;
 
-   my ($ra, $dec, $bright, $name) = split /,/;
+   my ($lon, $lat, $bright, $name) = split /,/;
 
    if (defined($stars{$name})) {
       print "duplicate name $name\n";
@@ -116,7 +116,7 @@ while (<>) {
    }
 
    if (length($name)) {
-      $stars{$name} = "$ra,$dec,$bright";
+      $stars{$name} = "$lon,$lat,$bright";
    }
 }
 
@@ -124,11 +124,11 @@ while (<>) {
 
 print "angling\n";
 for (my $i = 0; $i <= $#stars; $i++) {
-   my ($ra1, $de1, $bright1) = split /,/, $stars{$stars[$i]};
+   my ($lon1, $lat1, $bright1) = split /,/, $stars{$stars[$i]};
    for (my $j = $i + 1; $j <= $#stars; $j++) {
-      my ($ra2, $de2, $bright2) = split /,/, $stars{$stars[$j]};
+      my ($lon2, $lat2, $bright2) = split /,/, $stars{$stars[$j]};
 
-      my $sep = angsep_microdeg($ra1, $de1, $ra2, $de2);
+      my $sep = angsep_microdeg($lon1, $lat1, $lon2, $lat2);
 
       if ($sep > 9 && $sep <= 90_000_000) {
          #print "$sep,$stars[$i],$stars[$j]\n";
@@ -140,12 +140,12 @@ for (my $i = 0; $i <= $#stars; $i++) {
 
 print "tabling\n";
 for (my $i = 0; $i <= $#stars; $i++) {
-   my ($rai, $dei) = split /,/,$stars{$stars[$i]};
+   my ($loni, $lati) = split /,/,$stars{$stars[$i]};
    for (my $j = $i+1; $j <= $#stars; $j++) {
       if (!defined($angles{"$i,$j"})) {
          next;
       }
-      my ($raj, $dej) = split /,/,$stars{$stars[$j]};
+      my ($lonj, $latj) = split /,/,$stars{$stars[$j]};
       for (my $k = $j+1; $k <= $#stars; $k++) {
          if (!defined($angles{"$i,$k"})) {
             next;
@@ -153,9 +153,9 @@ for (my $i = 0; $i <= $#stars; $i++) {
          if (!defined($angles{"$j,$k"})) {
             next;
          }
-         my ($rak, $dek) = split /,/,$stars{$stars[$k]};
+         my ($lonk, $latk) = split /,/,$stars{$stars[$k]};
 
-         my $orientation = orientation_enu($rai,$dei,$raj,$dej,$rak,$dek);
+         my $orientation = orientation_enu($loni,$lati,$lonj,$latj,$lonk,$latk);
 
          # three angles exist...
          my $aij = $angles{"$i,$j"};
