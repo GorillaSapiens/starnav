@@ -130,7 +130,7 @@ for (my $i = 0; $i <= $#stars; $i++) {
 
       my $sep = angsep_microdeg($lon1, $lat1, $lon2, $lat2);
 
-      if ($sep > 9 && $sep <= 90_000_000) {
+      if ($sep > 5_000_000 && $sep <= 45_000_000) {
          #print "$sep,$stars[$i],$stars[$j]\n";
          $angles{"$i,$j"} = $sep;
          $angles{"$j,$i"} = $sep;
